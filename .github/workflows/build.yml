@@ -26,7 +26,7 @@ jobs:
           - ssl: nossl
             ssl_defines: ''
           - ssl: ssl
-            ssl_defines: '-DLLAMA_SERVER_SSL=ON -DOPENSSL_USE_STATIC_LIBS'
+            ssl_defines: '-DLLAMA_SERVER_SSL=ON -DOPENSSL_USE_STATIC_LIBS=1'
           - avx: noavx
             avx_defines: '-DLLAMA_AVX=OFF -DLLAMA_AVX2=OFF -DLLAMA_FMA=OFF'
           - avx: avx
