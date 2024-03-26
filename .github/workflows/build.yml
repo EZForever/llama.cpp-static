@@ -26,7 +26,7 @@ jobs:
           - ssl: nossl
             ssl_defines: ''
           - ssl: ssl
-            ssl_defines: '-DLLAMA_SERVER_SSL=ON'
+            ssl_defines: '-DLLAMA_SERVER_SSL=ON -DOPENSSL_USE_STATIC_LIBS'
           - avx: noavx
             avx_defines: '-DLLAMA_AVX=OFF -DLLAMA_AVX2=OFF -DLLAMA_FMA=OFF'
           - avx: avx
@@ -60,7 +60,7 @@ jobs:
           mkdir llama.cpp/build
           cd llama.cpp/build
           cmake .. -DLLAMA_NATIVE=OFF -DLLAMA_STATIC=ON -DLLAMA_BUILD_SERVER=ON -DCMAKE_BUILD_TYPE=Release ${{ matrix.ssl_defines }} ${{ matrix.avx_defines }}
-          cmake --build . --config Release -j ${{ steps.cpu-cores.outputs.count }}
+          cmake --build . --config Release --target server -j ${{ steps.cpu-cores.outputs.count }}
           strip bin/server
         shell: alpine.sh {0}
 
