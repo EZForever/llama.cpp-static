@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  server:
     runs-on: ubuntu-latest
 
     strategy:
@@ -37,28 +37,24 @@ jobs:
             avx_defines: '-DLLAMA_AVX512=ON'
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
       - name: Checkout llama.cpp
         uses: actions/checkout@v4
         with:
           repository: ggerganov/llama.cpp
-          path: llama.cpp
+
+      - name: Get number of CPU cores
+        uses: SimenB/github-actions-cpu-cores@v2
+        id: cpu-cores
 
       - name: Setup Alpine Linux
         uses: jirutka/setup-alpine@v1
         with:
           packages: build-base cmake ccache git openssl-dev openssl-libs-static
 
-      - name: Get number of CPU cores
-        uses: SimenB/github-actions-cpu-cores@v2
-        id: cpu-cores
-
       - name: CMake
         run: |
-          mkdir llama.cpp/build
-          cd llama.cpp/build
+          mkdir build
+          cd build
           cmake .. -DLLAMA_NATIVE=OFF -DLLAMA_STATIC=ON -DLLAMA_BUILD_SERVER=ON -DCMAKE_BUILD_TYPE=Release ${{ matrix.ssl_defines }} ${{ matrix.avx_defines }}
           cmake --build . --config Release --target server -j ${{ steps.cpu-cores.outputs.count }}
           strip bin/server
@@ -68,6 +64,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: server-${{ matrix.ssl }}-${{ matrix.avx }}
-          path: bin/server
+          path: build/bin/server
           if-no-files-found: error
 
