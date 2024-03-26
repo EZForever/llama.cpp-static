@@ -9,7 +9,7 @@ on:
 
   # Daily rebuild
   schedule:
-    - cron: "0 2 * * *"
+    - cron: "0 4 * * *"
 
   # Manual rebuild, in case of some important upstream change
   workflow_dispatch:
@@ -37,10 +37,14 @@ jobs:
             avx_defines: '-DLLAMA_AVX512=ON'
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Checkout llama.cpp
         uses: actions/checkout@v4
         with:
           repository: ggerganov/llama.cpp
+          path: repo
 
       - name: Get number of CPU cores
         uses: SimenB/github-actions-cpu-cores@v2
@@ -53,8 +57,8 @@ jobs:
 
       - name: CMake
         run: |
-          mkdir build
-          cd build
+          mkdir repo/build
+          cd repo/build
           cmake .. -DLLAMA_NATIVE=OFF -DLLAMA_STATIC=ON -DLLAMA_BUILD_SERVER=ON -DCMAKE_BUILD_TYPE=Release ${{ matrix.ssl_defines }} ${{ matrix.avx_defines }}
           cmake --build . --config Release --target server -j ${{ steps.cpu-cores.outputs.count }}
           strip bin/server
@@ -64,6 +68,16 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: server-${{ matrix.ssl }}-${{ matrix.avx }}
-          path: build/bin/server
+          path: repo/build/bin/server
           if-no-files-found: error
+
+      - name: Build and push Docker image
+        uses: macbre/push-to-ghcr@v13
+        with:
+          dockerfile: .devops/server.Dockerfile
+          context: repo/build/bin
+          image_name: ${{ github.repository }}
+          image_tag: server-${{ matrix.ssl }}-${{ matrix.avx }}
+          github_token: ${{ secrets.GHCR_ACCESS_TOKEN }}
+          docker_io_token: ${{ secrets.DOCKER_IO_ACCESS_TOKEN }}
 
