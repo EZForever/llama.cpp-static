@@ -3,9 +3,10 @@ name: build
 on:
   # Build file modifications
   push:
-    branches: [ "master" ]
+    branches: [ 'master' ]
+    paths: [ '.github/workflows/build.yml', '.devops/**' ]
   #pull_request:
-  #  branches: [ "master" ]
+  #  branches: [ 'master' ]
 
   # Daily rebuild
   schedule:
