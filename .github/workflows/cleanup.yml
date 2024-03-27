@@ -1,0 +1,23 @@
+name: cleanup
+
+on:
+  # Weekly cleanup
+  schedule:
+    - cron: "30 4 * * 3"
+
+  # Manual cleanup
+  workflow_dispatch:
+
+jobs:
+  ghcr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete untagged Docker images
+        uses: Chizkiyahu/delete-untagged-ghcr-action@v4
+        with:
+          token: ${{ secrets.GHCR_ACCESS_TOKEN }}
+          owner_type: user
+          package_name: ${{ github.repository }}
+          untagged_only: true
+
