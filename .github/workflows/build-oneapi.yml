@@ -1,0 +1,75 @@
+name: build
+
+on:
+  # Build file modifications
+  push:
+    branches: [ 'master' ]
+    paths: [ '.github/workflows/build-oneapi.yml', '.devops/**' ]
+  #pull_request:
+  #  branches: [ 'master' ]
+
+  # Weekly rebuild
+  #schedule:
+  #  - cron: "0 4 * * 3"
+
+  # Manual rebuild, in case of some important upstream change
+  workflow_dispatch:
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        ssl: [nossl]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout llama.cpp
+        uses: actions/checkout@v4
+        with:
+          repository: ggerganov/llama.cpp
+          path: repo
+
+      - name: Get number of CPU cores
+        uses: SimenB/github-actions-cpu-cores@v2
+        id: cpu-cores
+
+      - name: Setup Intel oneAPI compiler
+        run: |
+          apt-get update
+          apt-get install -y wget gpg
+          wget -q -O - https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor --output /etc/apt/trusted.gpg.d/oneapi.gpg
+          echo 'deb [trusted=yes] https://apt.repos.intel.com/oneapi all main' >/etc/apt/sources.list.d/oneapi.list
+          apt-get update
+          apt-get install -y intel-oneapi-compiler-dpcpp-cpp cmake git ccache
+
+      - name: CMake
+        run: |
+          . /opt/intel/oneapi/setvars.sh
+          mkdir repo/build
+          cd repo/build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_FLAGS="-Ofast -xCORE-AVX2" -DCMAKE_CXX_FLAGS="-Ofast -xCORE-AVX2" -DLLAMA_NATIVE=OFF -DLLAMA_STATIC=ON -DLLAMA_BUILD_SERVER=ON
+          cmake --build . --config Release --target server -j ${{ steps.cpu-cores.outputs.count }}
+          strip bin/server
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-${{ matrix.ssl }}-oneapi
+          path: repo/build/bin/server
+          if-no-files-found: error
+
+      - name: Build and push Docker image
+        uses: macbre/push-to-ghcr@v13
+        with:
+          dockerfile: .devops/server.Dockerfile
+          context: repo/build/bin
+          image_name: ${{ github.repository }}
+          image_tag: server-${{ matrix.ssl }}-oneapi
+          github_token: ${{ secrets.GHCR_ACCESS_TOKEN }}
+          docker_io_user: ${{ vars.DOCKER_IO_USER }}
+          docker_io_token: ${{ secrets.DOCKER_IO_ACCESS_TOKEN }}
+
