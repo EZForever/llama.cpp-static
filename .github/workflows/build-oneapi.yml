@@ -49,24 +49,22 @@ jobs:
       - name: CMake
         run: |
           . /opt/intel/oneapi/setvars.sh
-          mkdir repo/build
-          cd repo/build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_FLAGS="-Ofast -xCORE-AVX2" -DCMAKE_CXX_FLAGS="-Ofast -xCORE-AVX2" -DLLAMA_NATIVE=OFF -DLLAMA_STATIC=ON -DLLAMA_BUILD_SERVER=ON
-          cmake --build . --config Release --target server -j ${{ steps.cpu-cores.outputs.count }}
-          strip bin/server
+          cmake repo -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_FLAGS="-Ofast -xCORE-AVX2" -DCMAKE_CXX_FLAGS="-Ofast -xCORE-AVX2" -DLLAMA_NATIVE=OFF -DLLAMA_STATIC=ON -DLLAMA_BUILD_SERVER=ON
+          cmake --build build --config Release --target server -j ${{ steps.cpu-cores.outputs.count }}
+          strip build/bin/server
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: server-${{ matrix.ssl }}-oneapi
-          path: repo/build/bin/server
+          path: build/bin/server
           if-no-files-found: error
 
       - name: Build and push Docker image
         uses: macbre/push-to-ghcr@v13
         with:
           dockerfile: .devops/server.Dockerfile
-          context: repo/build/bin
+          context: build/bin
           image_name: ${{ github.repository }}
           image_tag: server-${{ matrix.ssl }}-oneapi
           github_token: ${{ secrets.GHCR_ACCESS_TOKEN }}
