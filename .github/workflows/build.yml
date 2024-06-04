@@ -58,7 +58,7 @@ jobs:
 
       - name: CMake
         run: |
-          cmake repo -B build -DCMAKE_BUILD_TYPE=Release -DLLAMA_NATIVE=OFF -DLLAMA_STATIC=ON -DLLAMA_BUILD_SERVER=ON ${{ matrix.ssl_defines }} ${{ matrix.avx_defines }}
+          cmake repo -B build -DCMAKE_BUILD_TYPE=Release -DLLAMA_NATIVE=OFF -DLLAMA_STATIC=ON -DLLAMA_BUILD_SERVER=ON -DLLAMA_OPENMP=OFF ${{ matrix.ssl_defines }} ${{ matrix.avx_defines }}
           cmake --build build --config Release --target server -j ${{ steps.cpu-cores.outputs.count }}
           strip build/bin/server
         shell: alpine.sh {0}
