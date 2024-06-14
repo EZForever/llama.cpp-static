@@ -50,20 +50,20 @@ jobs:
         run: |
           . /opt/intel/oneapi/setvars.sh
           cmake repo -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_FLAGS="-Ofast -xCORE-AVX2" -DCMAKE_CXX_FLAGS="-Ofast -xCORE-AVX2" -DLLAMA_NATIVE=OFF -DLLAMA_STATIC=ON -DLLAMA_BUILD_SERVER=ON -DLLAMA_OPENMP=OFF
-          cmake --build build --config Release --target server -j ${{ steps.cpu-cores.outputs.count }}
-          strip build/bin/server
+          cmake --build build --config Release --target llama-server -j ${{ steps.cpu-cores.outputs.count }}
+          strip build/bin/llama-server
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: server-${{ matrix.ssl }}-oneapi
-          path: build/bin/server
+          path: build/bin/llama-server
           if-no-files-found: error
 
       - name: Build and push Docker image
         uses: macbre/push-to-ghcr@v13
         with:
-          dockerfile: .devops/server.Dockerfile
+          dockerfile: .devops/llama-server.Dockerfile
           context: build/bin
           image_name: ${{ github.repository }}
           image_tag: server-${{ matrix.ssl }}-oneapi
