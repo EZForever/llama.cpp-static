@@ -29,13 +29,13 @@ jobs:
           - ssl: ssl
             ssl_defines: '-DLLAMA_SERVER_SSL=ON -DOPENSSL_USE_STATIC_LIBS=ON'
           - avx: noavx
-            avx_defines: '-DLLAMA_AVX=OFF -DLLAMA_AVX2=OFF -DLLAMA_FMA=OFF'
+            avx_defines: '-DGGML_AVX=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF'
           - avx: avx
-            avx_defines: '-DLLAMA_AVX2=OFF'
+            avx_defines: '-DGGML_AVX2=OFF'
           - avx: avx2
             avx_defines: ''
           - avx: avx512
-            avx_defines: '-DLLAMA_AVX512=ON'
+            avx_defines: '-DGGML_AVX512=ON'
 
     steps:
       - name: Checkout
@@ -58,7 +58,7 @@ jobs:
 
       - name: CMake
         run: |
-          cmake repo -B build -DCMAKE_BUILD_TYPE=Release -DLLAMA_NATIVE=OFF -DLLAMA_STATIC=ON -DLLAMA_BUILD_SERVER=ON -DLLAMA_OPENMP=OFF ${{ matrix.ssl_defines }} ${{ matrix.avx_defines }}
+          cmake repo -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="-static" -DGGML_NATIVE=OFF -DGGML_STATIC=ON -DGGML_OPENMP=OFF -DLLAMA_BUILD_SERVER=ON -DBUILD_SHARED_LIBS=OFF ${{ matrix.ssl_defines }} ${{ matrix.avx_defines }}
           cmake --build build --config Release --target llama-server -j ${{ steps.cpu-cores.outputs.count }}
           strip build/bin/llama-server
         shell: alpine.sh {0}
