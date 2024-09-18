@@ -27,3 +27,5 @@ Server images are tagged in the format of `server-<ssl>-<avx>`.
 - `avx512`: AVX512 base instruction set is enabled. Currently only some high-end or server-grade CPUs support this instruction set, so check your hardware specs before using this build.
 - `oneapi`: Experimental build with the Intel oneAPI compiler, inspired by ggerganov/llama.cpp#5067. Offers a ~30% speed increase (~20tok/s vs ~15tok/s) in prompt processing on my machine compared to `avx2` builds. Not updated daily.
 
+RPC server images are tagged in the format of `rpc-server-<ssl>-<avx>`. Refer to [rpc README](https://github.com/ggerganov/llama.cpp/tree/master/examples/rpc) for detailed information.
+
