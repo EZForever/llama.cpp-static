@@ -30,7 +30,7 @@ jobs:
       - name: Checkout llama.cpp
         uses: actions/checkout@v4
         with:
-          repository: ggerganov/llama.cpp
+          repository: ggml-org/llama.cpp
           path: repo
 
       - name: Get number of CPU cores
@@ -44,12 +44,12 @@ jobs:
           wget -q -O - https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | sudo gpg --dearmor --output /etc/apt/trusted.gpg.d/oneapi.gpg
           echo 'deb [trusted=yes] https://apt.repos.intel.com/oneapi all main' | sudo tee /etc/apt/sources.list.d/oneapi.list >/dev/null
           sudo apt-get update
-          sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp cmake git ccache
+          sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp cmake git
 
       - name: CMake
         run: |
           . /opt/intel/oneapi/setvars.sh
-          cmake repo -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_FLAGS="-Ofast -xCORE-AVX2" -DCMAKE_CXX_FLAGS="-Ofast -xCORE-AVX2" -DCMAKE_EXE_LINKER_FLAGS="-static" -DGGML_NATIVE=OFF -DGGML_STATIC=ON -DGGML_RPC=ON -DGGML_OPENMP=OFF -DLLAMA_BUILD_SERVER=ON -DBUILD_SHARED_LIBS=OFF
+          cmake repo -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DCMAKE_C_FLAGS="-Ofast -xCORE-AVX2" -DCMAKE_CXX_FLAGS="-Ofast -xCORE-AVX2" -DCMAKE_EXE_LINKER_FLAGS="-static" -DGGML_NATIVE=OFF -DGGML_STATIC=ON -DGGML_RPC=ON -DGGML_CCACHE=OFF -DGGML_OPENMP=OFF -DLLAMA_BUILD_SERVER=ON -DLLAMA_CURL=OFF -DBUILD_SHARED_LIBS=OFF
           cmake --build build --config Release --target llama-server --target rpc-server -j ${{ steps.cpu-cores.outputs.count }}
           strip build/bin/*
 
