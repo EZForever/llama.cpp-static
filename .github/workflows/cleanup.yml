@@ -20,40 +20,11 @@ jobs:
           echo "Repository name is: $REPOSITORY_NAME"
           echo "REPOSITORY_NAME=$REPOSITORY_NAME" >> $GITHUB_ENV
 
-      - name: Delete untagged images
+      - name: Delete untagged Docker images
         uses: Chizkiyahu/delete-untagged-ghcr-action@v4
         with:
           token: ${{ secrets.GHCR_ACCESS_TOKEN }}
           owner_type: user
           package_name: ${{ env.REPOSITORY_NAME }}
           untagged_only: true
-
-  docker:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Get repository name
-        run: |
-          REPOSITORY_NAME="${{ github.repository }}"
-          REPOSITORY_NAME="${REPOSITORY_NAME##*/}"
-          echo "Repository name is: $REPOSITORY_NAME"
-          echo "REPOSITORY_NAME=$REPOSITORY_NAME" >> $GITHUB_ENV
-
-      - name: Download regctl
-        run: |
-          curl -sSL https://github.com/regclient/regclient/releases/latest/download/regctl-linux-amd64 -o regctl
-          chmod +x ./regctl
-
-      - name: Registry login
-        run: |
-          ./regctl registry login docker.io -u "${{ vars.DOCKER_IO_USER }}" -p "${{ secrets.DOCKER_IO_ACCESS_TOKEN }}"
-
-      - name: Delete untagged images
-        run: |
-          ./regctl artifact list "docker.io/${{ vars.DOCKER_IO_USER }}/${{ env.REPOSITORY_NAME }}" --format json | \
-            jq -r '.[] | select(.tags == null or .tags | length == 0) | .digest' | \
-            while read digest; do
-              echo "Deleting untagged digest: $digest"
-              ./regctl manifest rm "docker.io/${{ vars.DOCKER_IO_USER }}/${{ env.REPOSITORY_NAME }}@$digest"
-            done
 
