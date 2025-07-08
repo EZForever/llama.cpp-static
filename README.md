@@ -1,7 +1,7 @@
 # llama.cpp-static
 Your daily, minimal build of llama.cpp. [Also available on Docker Hub.](https://hub.docker.com/r/ezforever/llama.cpp-static)
 
-Source code: <https://github.com/ggml-org/llama.cpp>
+Source code: <https://github.com/ggml-org/llama.cpp>  
 Built from: <https://github.com/EZForever/llama.cpp-static>
 
 ## Usage
