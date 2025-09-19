@@ -54,7 +54,7 @@ jobs:
 
       - name: CMake
         run: |
-          cmake repo -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="-static" -DGGML_NATIVE=OFF -DGGML_STATIC=ON -DGGML_RPC=ON -DGGML_CCACHE=OFF -DGGML_OPENMP=OFF -DLLAMA_BUILD_SERVER=ON -DLLAMA_CURL=OFF -DBUILD_SHARED_LIBS=OFF ${{ matrix.ssl_defines }} ${{ matrix.avx_defines }}
+          cmake repo -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="-static" -DGGML_NATIVE=OFF -DGGML_STATIC=ON -DGGML_RPC=ON -DGGML_CCACHE=OFF -DLLAMA_BUILD_SERVER=ON -DLLAMA_CURL=OFF -DBUILD_SHARED_LIBS=OFF ${{ matrix.ssl_defines }} ${{ matrix.avx_defines }}
           cmake --build build --config Release --target llama-server --target rpc-server -j $(nproc)
           strip build/bin/*
         shell: alpine.sh {0}
