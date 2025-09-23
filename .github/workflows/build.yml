@@ -50,7 +50,7 @@ jobs:
       - name: Setup Alpine Linux
         uses: jirutka/setup-alpine@v1
         with:
-          packages: build-base cmake git openssl-dev openssl-libs-static
+          packages: build-base cmake git linux-headers openssl-dev openssl-libs-static
 
       - name: CMake
         run: |
