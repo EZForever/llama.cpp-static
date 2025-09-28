@@ -25,9 +25,9 @@ jobs:
         avx: [noavx, avx, avx2, avx512]
         include:
           - ssl: nossl
-            ssl_defines: ''
+            ssl_defines: '-DLLAMA_OPENSSL=OFF'
           - ssl: ssl
-            ssl_defines: '-DLLAMA_SERVER_SSL=ON -DOPENSSL_USE_STATIC_LIBS=ON'
+            ssl_defines: '-DOPENSSL_USE_STATIC_LIBS=ON'
           - avx: noavx
             avx_defines: '-DGGML_AVX=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF'
           - avx: avx
