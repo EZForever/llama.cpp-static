@@ -17,7 +17,7 @@ Server images are tagged in the format of `server-<ssl>-<avx>`.
 `<ssl>` is one of the following:
 
 - `nossl`: Minimal build with no SSL/TLS capability. 
-- `ssl`: Built with OpenSSL (`LLAMA_SERVER_SSL=ON`), thus supports `--ssl-key-file` and `--ssl-cert-file`.
+- `ssl`: Built with OpenSSL (`LLAMA_OPENSSL=ON`), thus with SSL and model downloading support.
 
 `<avx>` is one of the following:
 
