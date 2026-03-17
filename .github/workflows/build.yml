@@ -39,10 +39,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout llama.cpp
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ggml-org/llama.cpp
           path: repo
@@ -60,14 +60,14 @@ jobs:
         shell: alpine.sh {0}
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: server-${{ matrix.ssl }}-${{ matrix.avx }}
           path: build/bin/*
           if-no-files-found: error
 
       - name: Build and push llama-server Docker image
-        uses: macbre/push-to-ghcr@v14
+        uses: macbre/push-to-ghcr@v16
         with:
           dockerfile: .devops/llama-server.Dockerfile
           context: build/bin
@@ -78,7 +78,7 @@ jobs:
           docker_io_token: ${{ secrets.DOCKER_IO_ACCESS_TOKEN }}
 
       - name: Build and push rpc-server Docker image
-        uses: macbre/push-to-ghcr@v14
+        uses: macbre/push-to-ghcr@v16
         with:
           dockerfile: .devops/rpc-server.Dockerfile
           context: build/bin
