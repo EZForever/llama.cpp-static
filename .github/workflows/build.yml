@@ -55,16 +55,27 @@ jobs:
       - name: CMake
         run: |
           cmake repo -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="-static" -DGGML_NATIVE=OFF -DGGML_STATIC=ON -DGGML_RPC=ON -DGGML_CCACHE=OFF -DLLAMA_BUILD_SERVER=ON -DBUILD_SHARED_LIBS=OFF ${{ matrix.ssl_defines }} ${{ matrix.avx_defines }}
-          cmake --build build --config Release --target llama-server --target rpc-server -j $(nproc)
+          cmake --build build --config Release --target llama-cli --target llama-server --target rpc-server -j $(nproc)
           strip build/bin/*
         shell: alpine.sh {0}
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v6
         with:
-          name: server-${{ matrix.ssl }}-${{ matrix.avx }}
+          name: build-${{ matrix.ssl }}-${{ matrix.avx }}
           path: build/bin/*
           if-no-files-found: error
+
+      - name: Build and push llama-cli Docker image
+        uses: macbre/push-to-ghcr@v16
+        with:
+          dockerfile: .devops/llama-cli.Dockerfile
+          context: build/bin
+          image_name: ${{ github.repository }}
+          image_tag: cli-${{ matrix.ssl }}-${{ matrix.avx }}
+          github_token: ${{ secrets.GHCR_ACCESS_TOKEN }}
+          docker_io_user: ${{ vars.DOCKER_IO_USER }}
+          docker_io_token: ${{ secrets.DOCKER_IO_ACCESS_TOKEN }}
 
       - name: Build and push llama-server Docker image
         uses: macbre/push-to-ghcr@v16

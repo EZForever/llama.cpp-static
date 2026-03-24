@@ -6,13 +6,17 @@ Built from: <https://github.com/EZForever/llama.cpp-static>
 
 ## Usage
 
-Please refer to [llama.cpp docker guide](https://github.com/ggml-org/llama.cpp/blob/master/docs/docker.md) and [server README](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md).
+Please refer to llama.cpp official docs:
+
+- [llama.cpp docker guide](https://github.com/ggml-org/llama.cpp/blob/master/docs/docker.md)
+- [llama-cli README](https://github.com/ggml-org/llama.cpp/blob/master/tools/cli/README.md)
+- [llama-server README](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md)
 
 ## Tag format
 
-**tl;dr:** Use `server-ssl-avx2` if you don't know what you're doing.
+**tl;dr:** If you don't know which image tag to use, choose `cli-ssl-avx2` for running models on your computer (access from command-line), or `server-ssl-avx2` for server deployment.
 
-Server images are tagged in the format of `server-<ssl>-<avx>`.
+CLI and server images are tagged in the format of `cli-<ssl>-<avx>` and `server-<ssl>-<avx>`, respectively.
 
 `<ssl>` is one of the following:
 
@@ -26,5 +30,5 @@ Server images are tagged in the format of `server-<ssl>-<avx>`.
 - `avx2`: AVX2 instruction set is enabled. This build should support most modern/recent CPUs with reasonable performance.
 - `avx512`: AVX512 base instruction set is enabled. Currently only some high-end or server-grade CPUs support this instruction set, so check your hardware specs before using this build.
 
-RPC server images are tagged in the format of `rpc-server-<ssl>-<avx>`. Refer to [rpc README](https://github.com/ggml-org/llama.cpp/blob/master/tools/rpc/README.md) for detailed information.
+RPC server images are tagged in the format of `rpc-server-<ssl>-<avx>`. Refer to [rpc-server README](https://github.com/ggml-org/llama.cpp/blob/master/tools/rpc/README.md) for detailed information.
 
